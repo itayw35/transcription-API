@@ -2,7 +2,7 @@ const { BatchClient } = require("@speechmatics/batch-client");
 const { log } = require("node:console");
 const { json } = require("node:stream/consumers");
 const fs = require("fs");
-const docx = require("docx");
+const { Document, Paragraph, Packer, TextRun } = require("docx");
 
 async function transcribeFile(file, fileName) {
   if (!file) throw { code: 400, message: "missing file" };
@@ -11,7 +11,6 @@ async function transcribeFile(file, fileName) {
     apiUrl: "https://eu1.asr.api.speechmatics.com/v2",
     appId: "my_app",
   });
-  console.log(client);
 
   try {
     const fileToTranscribe = new File([file], fileName);
@@ -37,7 +36,8 @@ async function transcribeFile(file, fileName) {
     console.log(res);
     const filePath = "/Users/itayweinberg/Desktop";
     try {
-      fs.writeFileSync(`${filePath}/transcription.txt`, res);
+      openDoc(res);
+      // fs.writeFileSync(`${filePath}/transcription.txt`, res);
     } catch (err) {
       console.log(err);
     }
@@ -47,4 +47,31 @@ async function transcribeFile(file, fileName) {
     return { code: 500, message: err };
   }
 }
+const openDoc = async (content) => {
+  const doc = new Document({
+    sections: [
+      {
+        properties: {},
+        children: [
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: "Transcript:\n",
+                bold: true,
+              }),
+              new TextRun(content),
+            ],
+          }),
+        ],
+      },
+    ],
+  });
+
+  // Used to export the file into a .docx file
+
+  const filePath = "/Users/itayweinberg/Desktop"; //adjust to your needs
+  Packer.toBuffer(doc).then((buffer) => {
+    fs.writeFileSync(`${filePath}/transcription.docx`, buffer, "utf8");
+  });
+};
 module.exports = { transcribeFile };
