@@ -33,8 +33,6 @@ async function transcribeFile(file, fileName) {
       typeof response === "string"
         ? response
         : response.results.map((r) => r.alternatives?.[0].content).join(" ");
-    console.log(res);
-    const filePath = "/Users/itayweinberg/Desktop";
     try {
       openDoc(res);
       // fs.writeFileSync(`${filePath}/transcription.txt`, res);
