@@ -1,4 +1,6 @@
-const validateExtension = (fileName) => {
+const validateExtension = (req, res, next) => {
+  try{
+  const fileName = req.file.originalname;
   const extension = fileName.split(".").pop().toLowerCase();
   const allowedExtensions = [
     "mp3",
@@ -9,6 +11,7 @@ const validateExtension = (fileName) => {
     "aac",
     "ogg",
     "wma",
+    "mov"
   ];
   if (!allowedExtensions.includes(extension)) {
     throw {
@@ -18,8 +21,9 @@ const validateExtension = (fileName) => {
         allowedExtensions.join(", "),
     };
   }
-  return (req, res, next) => {
     next();
+  } catch (err){
+    res.status(err.code).send(err.message); 
   };
 };
 module.exports = { validateExtension };

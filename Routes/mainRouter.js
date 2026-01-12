@@ -3,12 +3,12 @@ const express = require("express");
 const router = express.Router();
 const multer = require("multer");
 const upload = multer();
-const validateExtension = require("../middleware/validateExtension");
+const {validateExtension} = require("../middleware/validateExtension");
 
 router.post(
   "/transcribe",
   upload.single("myFile"),
-  validateExtension(req.file.originalname),
+  validateExtension,
   async (req, res) => {
     try {
       const file = await transcriptLogic.transcribeFile(
